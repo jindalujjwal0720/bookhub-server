@@ -17,6 +17,9 @@ const validateToken = async (req, res, next) => {
     const accessToken = token.split(" ")[1];
     const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
     const user = await getUserById(decoded.id);
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
     req.user = user;
     next();
   } catch (err) {

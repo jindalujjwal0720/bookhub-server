@@ -1,6 +1,11 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { getUserByEmail, createNewUser, getUserById } = require("../db/user");
+const {
+  getUserByEmail,
+  createNewUser,
+  getUserById,
+  validateNewUserRequiredFields,
+} = require("../db/user");
 
 /**
  * signs up a new user and returns the token and user
@@ -11,10 +16,7 @@ const { getUserByEmail, createNewUser, getUserById } = require("../db/user");
 const signup = async (req, res) => {
   const { user } = req.body;
   const { email, password } = user;
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-  user.password = hashedPassword;
-  const oldUser = getUserByEmail(email);
+  const oldUser = await getUserByEmail(email);
   if (oldUser) {
     return res.status(409).send("User already exists. Please login.");
   }
@@ -22,6 +24,9 @@ const signup = async (req, res) => {
   if (requiredFieldsError) {
     return res.status(400).send(requiredFieldsError);
   }
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  user.password = hashedPassword;
   const newUser = await createNewUser(user);
   const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -36,7 +41,7 @@ const signup = async (req, res) => {
  * @returns
  */
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body.user;
   const user = await getUserByEmail(email);
   if (!user) {
     return res.status(404).send("User not found. Please signup.");
@@ -51,6 +56,12 @@ const login = async (req, res) => {
   res.status(200).json({ accessToken: token, user });
 };
 
+/**
+ * returns the user with the given id
+ * @param {Object} req
+ * @param {Object} res
+ * @returns
+ */
 const getUser = async (req, res) => {
   const { id } = req.params;
   const user = await getUserById(id);

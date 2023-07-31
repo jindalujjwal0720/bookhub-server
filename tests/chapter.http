@@ -1,0 +1,35 @@
+@base_url = http://localhost:3001/api
+@access_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0Yzc1ODg5ZjdhNDRhMTliNWU5NWJmMCIsImlhdCI6MTY5MDc5NjI0NCwiZXhwIjoxNjkzMzg4MjQ0fQ.QNY4HuyVqaPRldjYpBtqMPwyWYipJfdNLOoEkf6XCM8
+
+### Create a new chapter
+POST {{base_url}}/chapter
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+    "chapter": {
+        "title": "The first chapter",
+        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla euismod, nisl vitae aliquam ultricies, nunc nisl ultricies nunc, vitae aliquam nisl nisl vitae aliquam ultricies, nunc nisl ultricies nunc, vitae aliquam nisl"
+    },
+    "bookId": "64c78d3352513ac8eb022a82"
+}
+
+### Get chapter by id
+GET {{base_url}}/chapter/64c797814ca21c4c1120d5dd
+
+### Update chapter
+PATCH {{base_url}}/chapter/64c797814ca21c4c1120d5dd
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+    "chapter": {
+        "chapterNumber": 1
+    },
+    "bookId": "64c78d3352513ac8eb022a82"
+}
+
+### Delete chapter
+DELETE {{base_url}}/chapter/64c797814ca21c4c1120d5dd
+Content-Type: application/json
+Authorization: Bearer {{access_token}}

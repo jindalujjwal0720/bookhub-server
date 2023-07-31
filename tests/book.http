@@ -1,0 +1,44 @@
+@base_url = http://localhost:3001/api
+@access_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0Yzc1ODg5ZjdhNDRhMTliNWU5NWJmMCIsImlhdCI6MTY5MDc5NjI0NCwiZXhwIjoxNjkzMzg4MjQ0fQ.QNY4HuyVqaPRldjYpBtqMPwyWYipJfdNLOoEkf6XCM8
+
+### create a new book
+POST {{base_url}}/book
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+    "book": {
+        "title": "Admin's Secret to Nothing"
+    }
+}
+
+### get book by book id
+GET {{base_url}}/book/64c78d3352513ac8eb022a82
+
+### get all books
+GET {{base_url}}/book
+
+### get all books by author id
+GET {{base_url}}/book?authorId=64c75889f7a44a19b5e95bf0
+
+### get all books by genre
+GET {{base_url}}/book?genre=Fantasy
+
+### get all books by tags
+GET {{base_url}}/book?tags=Fantasy,Adventure
+
+### update book by book id
+PATCH {{base_url}}/book/64c78d3352513ac8eb022a82
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+    "book": {
+        "title": "Admin's Secret to Everything"
+    }
+}
+
+### delete book by book id
+DELETE {{base_url}}/book/64c78d3352513ac8eb022a82
+Content-Type: application/json
+Authorization: Bearer {{access_token}}

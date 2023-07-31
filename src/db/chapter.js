@@ -2,14 +2,17 @@ const Chapter = require("../models/chapter");
 
 /**
  * returns the chapter with the given id
- * @param {string} id
+ * @param {string} chapterId
  * @returns
  */
-const getChapterById = async (id) => {
-  const chapter = await Chapter.findById(id)
-    .populate("book", "title author")
-    .select("+content");
-  return chapter;
+const getChapterById = async (chapterId) => {
+  if (!chapterId) return null;
+  try {
+    const chapter = await Chapter.findById(chapterId).select("+content");
+    return chapter;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -18,11 +21,16 @@ const getChapterById = async (id) => {
  * @returns
  */
 const getChaptersByBookId = async (bookId) => {
-  const chapters = await Chapter.find({ book: bookId })
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .select("-content");
-  return chapters;
+  if (!bookId) return null;
+  try {
+    const chapters = await Chapter.find({ book: bookId })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .select("-content");
+    return chapters;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -31,7 +39,8 @@ const getChaptersByBookId = async (bookId) => {
  * @returns
  */
 const validateChapterRequiredFields = (chapterData) => {
-  if (!chapterData.title) return "Title is required";
+  const { title } = chapterData;
+  if (!title) return "Title is required";
   return null;
 };
 
@@ -41,8 +50,13 @@ const validateChapterRequiredFields = (chapterData) => {
  * @returns
  */
 const createNewChapter = async (chapterData) => {
-  const chapter = await Chapter.create(chapterData);
-  return chapter;
+  if (!chapterData) return null;
+  try {
+    const chapter = await Chapter.create(chapterData);
+    return chapter;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -52,14 +66,21 @@ const createNewChapter = async (chapterData) => {
  * @returns
  */
 const updateChapter = async (chapterId, chapterData) => {
-  const updatedChapter = await Chapter.findByIdAndUpdate(
-    chapterId,
-    chapterData,
-    {
-      new: true,
+  if (!chapterId || !chapterData) return null;
+  try {
+    const updatedChapter = await Chapter.findById(chapterId);
+    if (!updatedChapter) return null;
+    const { book, ...rest } = chapterData;
+    for (let key in rest) {
+      updatedChapter[key] = rest[key];
     }
-  );
-  return updatedChapter;
+    const requiredFieldsError = validateChapterRequiredFields(updatedChapter);
+    if (requiredFieldsError) return requiredFieldsError;
+    await updatedChapter.save();
+    return updatedChapter;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -68,8 +89,13 @@ const updateChapter = async (chapterId, chapterData) => {
  * @returns
  */
 const deleteChapter = async (chapterId) => {
-  const deletedChapter = await Chapter.findByIdAndDelete(chapterId);
-  return deletedChapter;
+  if (!chapterId) return null;
+  try {
+    const deletedChapter = await Chapter.findByIdAndDelete(chapterId);
+    return deletedChapter;
+  } catch (error) {
+    return null;
+  }
 };
 
 module.exports = {

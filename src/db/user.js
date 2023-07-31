@@ -6,8 +6,13 @@ const User = require("../models/user");
  * @returns
  */
 const getUserById = async (id) => {
-  const user = await User.findById(id);
-  return user;
+  if (!id) return null;
+  try {
+    const user = await User.findById(id);
+    return user;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -16,8 +21,13 @@ const getUserById = async (id) => {
  * @returns
  */
 const getUserByEmail = async (email) => {
-  const user = await User.findOne({ email: email });
-  return user;
+  if (!email) return null;
+  try {
+    const user = await User.findOne({ email: email });
+    return user;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -44,8 +54,13 @@ const validateNewUserRequiredFields = (userData) => {
  * @returns
  */
 const createNewUser = async (userData) => {
-  const newUser = await User.create(userData);
-  return newUser;
+  if (!userData) return null;
+  try {
+    const newUser = await User.create(userData);
+    return newUser;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -55,8 +70,15 @@ const createNewUser = async (userData) => {
  * @returns
  */
 const updateUser = async (userId, userData) => {
-  const updatedUser = await User.findByIdAndUpdate(id, userData, { new: true });
-  return updatedUser;
+  if (!userId || !userData) return null;
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, userData, {
+      new: true,
+    });
+    return updatedUser;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -65,8 +87,13 @@ const updateUser = async (userId, userData) => {
  * @returns
  */
 const deleteUser = async (userId) => {
-  const deletedUser = await User.findByIdAndDelete(userId);
-  return deletedUser;
+  if (!userId) return null;
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+    return deletedUser;
+  } catch (error) {
+    return null;
+  }
 };
 
 module.exports = {

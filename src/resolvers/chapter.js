@@ -51,13 +51,11 @@ const createChapter = async (req, res) => {
 const updateChapterById = async (req, res) => {
   const { id } = req.params;
   const { chapter } = req.body;
-  const requiredFieldsError = validateChapterRequiredFields(chapter);
-  if (requiredFieldsError) {
-    return res.status(400).send(requiredFieldsError);
-  }
   const updatedChapter = await updateChapter(id, chapter);
   if (!updatedChapter) {
     return res.status(404).send("Chapter not found.");
+  } else if (typeof updatedChapter === "string") {
+    return res.status(400).send(updatedChapter);
   }
   res.json(updatedChapter);
 };

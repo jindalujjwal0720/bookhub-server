@@ -1,3 +1,5 @@
+const { getBookById } = require("../db/book");
+
 /**
  * validates if the book exists and if the user is the author of the book
  * @param {Object} req
@@ -8,14 +10,15 @@
 const validateBookForChapter = async (req, res, next) => {
   const { user } = req;
   const { bookId } = req.body;
-  const bookFromDb = await getBookById(bookId);
-  if (!bookFromDb) {
+  const book = await getBookById(bookId);
+  if (!book) {
     return res.status(404).send("Book not found.");
   }
-  if (user._id.toString() !== bookFromDb.author.toString()) {
+  const isAuthor = user.books.find((book) => book.toString() === bookId);
+  if (!isAuthor) {
     return res.status(403).send("Forbidden.");
   }
-  req.book = bookFromDb;
+  req.book = book;
   next();
 };
 

@@ -18,6 +18,10 @@ const chapterSchema = new mongoose.Schema({
     trim: true,
     select: false,
   },
+  chapterNumber: {
+    type: Number,
+    required: false,
+  },
   book: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Book",

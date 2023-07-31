@@ -6,8 +6,15 @@ const Book = require("../models/book");
  * @returns
  */
 const getBookById = async (id) => {
-  const book = await Book.findById(id);
-  return book;
+  if (!id) return null;
+  try {
+    const book = await Book.findById(id)
+      .populate("author")
+      .populate("chapters", "title chapterNumber");
+    return book;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -18,10 +25,15 @@ const getBookById = async (id) => {
  * @returns
  */
 const getBooksByAuthorId = async (authorId, page = 1, limit = 10) => {
-  const books = await Book.find({ author: authorId })
-    .skip((page - 1) * limit)
-    .limit(limit);
-  return books;
+  if (!authorId) return null;
+  try {
+    const books = await Book.find({ author: authorId })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    return books;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -32,10 +44,15 @@ const getBooksByAuthorId = async (authorId, page = 1, limit = 10) => {
  * @returns
  */
 const getBooksByGenre = async (genre, page = 1, limit = 10) => {
-  const books = await Book.find({ genre: genre })
-    .skip((page - 1) * limit)
-    .limit(limit);
-  return books;
+  if (!genre) return null;
+  try {
+    const books = await Book.find({ genre: genre })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    return books;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -46,10 +63,32 @@ const getBooksByGenre = async (genre, page = 1, limit = 10) => {
  * @returns
  */
 const getBooksByTags = async (tags, page = 1, limit = 10) => {
-  const books = await Book.find({ tags: { $in: tags } })
-    .skip((page - 1) * limit)
-    .limit(limit);
-  return books;
+  if (!tags) return null;
+  try {
+    const books = await Book.find({ tags: { $in: tags } })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    return books;
+  } catch (error) {
+    return null;
+  }
+};
+
+/**
+ * returns all the books; paginated with the given page and limit
+ * @param {Int} page
+ * @param {Int} limit
+ * @returns
+ */
+const getAllBooks = async (page = 1, limit = 10) => {
+  try {
+    const books = await Book.find({})
+      .skip((page - 1) * limit)
+      .limit(limit);
+    return books;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -69,21 +108,37 @@ const validateBookRequiredFields = (bookData) => {
  * @returns
  */
 const createNewBook = async (bookData) => {
-  const newBook = await Book.create(bookData);
-  return newBook;
+  if (!bookData) return null;
+  try {
+    const newBook = await Book.create(bookData);
+    return newBook;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
- * updates the book and returns it
+ * updates the book with the provided data and returns it
  * @param {String} bookId
  * @param {Object} bookData
  * @returns
  */
 const updateBook = async (bookId, bookData) => {
-  const updatedBook = await Book.findByIdAndUpdate(bookId, bookData, {
-    new: true,
-  });
-  return updatedBook;
+  if (!bookId || !bookData) return null;
+  try {
+    const updatedBook = await Book.findById(bookId);
+    if (!updatedBook) return null;
+    const { author, ...rest } = bookData;
+    for (let key in rest) {
+      updatedBook[key] = rest[key];
+    }
+    const requiredFieldsError = validateBookRequiredFields(updatedBook);
+    if (requiredFieldsError) return requiredFieldsError;
+    await updatedBook.save();
+    return updatedBook;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -92,8 +147,13 @@ const updateBook = async (bookId, bookData) => {
  * @returns
  */
 const deleteBook = async (bookId) => {
-  const deletedBook = await Book.findByIdAndDelete(bookId);
-  return deletedBook;
+  if (!bookId) return null;
+  try {
+    const deletedBook = await Book.findByIdAndDelete(bookId);
+    return deletedBook;
+  } catch (error) {
+    return null;
+  }
 };
 
 module.exports = {
@@ -101,6 +161,7 @@ module.exports = {
   getBooksByAuthorId,
   getBooksByGenre,
   getBooksByTags,
+  getAllBooks,
   validateBookRequiredFields,
   createNewBook,
   updateBook,

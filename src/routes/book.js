@@ -13,7 +13,7 @@ const {
 router.get("/:id", getBook);
 router.get("/", getBooks);
 router.post("/", validateToken, createBook);
-router.put("/:id", validateToken, validateBookAuthor, updateBookById);
+router.patch("/:id", validateToken, validateBookAuthor, updateBookById);
 router.delete("/:id", validateToken, validateBookAuthor, deleteBookById);
 
 module.exports = router;

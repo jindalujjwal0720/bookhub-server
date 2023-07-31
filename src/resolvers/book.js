@@ -5,6 +5,9 @@ const {
   updateBook,
   deleteBook,
   getBooksByAuthorId,
+  getBooksByGenre,
+  getBooksByTags,
+  getAllBooks,
 } = require("../db/book");
 
 /**
@@ -34,19 +37,23 @@ const getBook = async (req, res) => {
  * GET /books?genre=fantasy
  * // returns the books with the given tags
  * GET /books?tags=fantasy,adventure
- * // returns the books of the logged in user
+ * // return all the books
  * GET /books
  */
 const getBooks = async (req, res) => {
+  if (typeof req.query.tags === "string")
+    req.query.tags = req.query.tags.split(",");
   const { authorId, genre, tags, page, limit } = req.query;
   let books;
   if (authorId) books = await getBooksByAuthorId(authorId, page, limit);
   else if (genre) books = await getBooksByGenre(genre, page, limit);
   else if (tags) books = await getBooksByTags(tags, page, limit);
-  else books = await getBooksByAuthorId(req.user._id, page, limit);
+  else books = await getAllBooks(page, limit);
   return res.json({
     books,
     authorId,
+    genre,
+    tags,
     page,
     count: books.length,
   });
@@ -68,8 +75,8 @@ const createBook = async (req, res) => {
   const newBook = await createNewBook(book);
   user.books.push(newBook._id);
   await user.save();
-  book.author = user._id;
-  await book.save();
+  newBook.author = user._id;
+  await newBook.save();
   res.status(201).json(newBook);
 };
 
@@ -82,13 +89,12 @@ const createBook = async (req, res) => {
 const updateBookById = async (req, res) => {
   const { id } = req.params;
   const { book } = req.body;
-  const requiredFieldsError = validateBookRequiredFields(book);
-  if (requiredFieldsError) {
-    return res.status(400).send(requiredFieldsError);
-  }
   const updatedBook = await updateBook(id, book);
+  // either the book was not found or there was an error
   if (!updatedBook) {
     return res.status(404).send("Book not found.");
+  } else if (typeof updatedBook === "string") {
+    return res.status(400).send(updatedBook);
   }
   res.json(updatedBook);
 };

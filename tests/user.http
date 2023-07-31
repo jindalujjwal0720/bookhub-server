@@ -1,0 +1,27 @@
+@base_url = http://localhost:3001/api
+
+### create a new user
+POST {{base_url}}/user/signup
+Content-Type: application/json
+
+{
+    "user": {
+        "name": "admin",
+        "email": "admin@gmail.com",
+        "password": "12345678"
+    }
+}
+
+### get user with given id 
+GET {{base_url}}/user/64c75889f7a44a19b5e95bf0
+
+### login user
+POST {{base_url}}/user/login
+Content-Type: application/json
+
+{
+    "user": {
+        "email": "admin@gmail.com",
+        "password": "12345678"
+    }
+}

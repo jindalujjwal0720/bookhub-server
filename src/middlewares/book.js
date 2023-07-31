@@ -7,8 +7,9 @@
  */
 const validateBookAuthor = (req, res, next) => {
   const { user } = req;
-  const { book } = req.body;
-  if (user._id.toString() !== book.author.toString()) {
+  const { id } = req.params;
+  const book = user.books.find((book) => book.toString() === id);
+  if (!book) {
     return res.status(403).send("Forbidden.");
   }
   next();

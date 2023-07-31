@@ -11,7 +11,7 @@ const {
 
 router.get("/:id", getChapter);
 router.post("/", validateToken, validateBookForChapter, createChapter);
-router.put("/:id", validateToken, validateBookForChapter, updateChapterById);
+router.patch("/:id", validateToken, validateBookForChapter, updateChapterById);
 router.delete("/:id", validateToken, validateBookForChapter, deleteChapterById);
 
 module.exports = router;
